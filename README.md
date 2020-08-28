@@ -15,24 +15,26 @@ Browser platform is currently supported with some limitations as described in [b
 ## WARNINGS
 
 - **Multiple SQLite corruption problem** - see section below & [`storesafe/cordova-sqlite-storage#626`](https://github.com/storesafe/cordova-sqlite-storage/issues/626)
-- **Breaking changes coming soon** - see section nearby & see [`storesafe/cordova-sqlite-storage#922`](https://github.com/storesafe/cordova-sqlite-storage/issues/922)
+- **Breaking changes coming up** - see section nearby & see [`storesafe/cordova-sqlite-storage#922`](https://github.com/storesafe/cordova-sqlite-storage/issues/922)
 
 ## Comparison of supported plugin versions
 
 | | Free license terms | Commercial license & support |
 | --- | --- | --- |
 | [`cordova-sqlite-storage`](https://github.com/storesafe/cordova-sqlite-storage) - core plugin version | MIT (or Apache 2.0 on Android & Windows) | |
-| [`cordova-sqlite-express-build-support`](https://github.com/storesafe/cordova-sqlite-express-build-support) - using built-in SQLite libraries on Android, iOS, and macOS | MIT (or Apache 2.0 on Android & Windows) | |
-| [`cordova-sqlite-ext`](https://github.com/brodybits/cordova-sqlite-ext) - with extra features including BASE64, REGEXP, and pre-populated databases | MIT (or Apache 2.0 on Android & Windows) | |
-| [`cordova-sqlite-evcore-extbuild-free`](https://github.com/storesafe/cordova-sqlite-evcore-extbuild-free) - plugin version with lighter resource usage in Android NDK | GPL v3 | available, see <https://storesafe.io/> |
-| [`cordova-plugin-sqlite-evplus-ext-common-free`](https://github.com/storesafe/cordova-plugin-sqlite-evplus-ext-common-free) - includes workaround for extra-large result data on Android and lighter resource usage on iOS, macOS, and in Android NDK | GPL v3 | available, see <https://storesafe.io/> |
+| [`cordova-sqlcipher-adapter`](https://github.com/storesafe/cordova-sqlcipher-adapter) - includes encryption functionality using [SQLCipher](https://www.zetetic.net/sqlcipher/) for Android/iOS/macOS | Permissive (see [`cordova-sqlcipher-adapter`](https://github.com/storesafe/cordova-sqlcipher-adapter) for details) | available - contact <sales@storesafe.io> |
+| [`cordova-sqlite-express-build-support`](https://github.com/storesafe/cordova-sqlite-express-build-support) - using built-in SQLite libraries on Android, iOS, and macOS | MIT (or Apache 2.0 on Android & Windows) | available - contact <sales@storesafe.io> |
+| [`cordova-sqlite-ext`](https://github.com/brodybits/cordova-sqlite-ext) - with extra features including BASE64 (SELECT BLOB in Base64 format), REGEXP, and pre-populated databases | MIT (or Apache 2.0 on Android & Windows) | |
+| [`cordova-sqlite-evcore-extbuild-free`](https://github.com/storesafe/cordova-sqlite-evcore-extbuild-free) - plugin version with lighter resource usage in Android NDK | GPL v3 | available, see <https://storesafe.io/> or contact <sales@storesafe.io> |
+| [`cordova-plugin-sqlite-evplus-ext-common-free`](https://github.com/storesafe/cordova-plugin-sqlite-evplus-ext-common-free) - includes workaround for extra-large result data on Android and lighter resource usage on iOS, macOS, and in Android NDK | GPL v3 | available, see <https://storesafe.io/> or contact <sales@storesafe.io> |
 
-### COMING SOON
+see [alternatives](#alternatives) section below for some more details
 
-New SQLite plugin design with a simpler API is in progress with a working demo - see [`brodybits/ask-me-anything#3`](https://github.com/brodybits/ask-me-anything/issues/3)
+### in progress
 
+New low-level SQLite plugin design with a simpler API is in progress with a working demo - see [`brodybits/ask-me-anything#3`](https://github.com/brodybits/ask-me-anything/issues/3)
 
-## Breaking changes coming soon
+## Breaking changes coming up
 
 in an upcoming major release - see [`storesafe/cordova-sqlite-storage#922`](https://github.com/storesafe/cordova-sqlite-storage/issues/922)
 
@@ -264,7 +266,7 @@ See the [Sample section](#sample) for a sample with a more detailed explanation 
   - [storesafe/cordova-sqlite-storage#837](https://github.com/storesafe/cordova-sqlite-storage/issues/837)
 - Using `SQLITE_DEFAULT_SYNCHRONOUS=3` (EXTRA DURABLE) build setting to be extra robust against possible database corruption ref: [storesafe/cordova-sqlite-storage#736](https://github.com/storesafe/cordova-sqlite-storage/issues/736)
 - `SQLITE_DBCONFIG_DEFENSIVE` flag is used for extra SQL safety, as described above
-- Recent build fixes:
+- Resolved build issues on iOS and macOS:
   - Fixed iOS/macOS platform version to use *custom* version of [PSPDFThreadSafeMutableDictionary.m](https://gist.github.com/steipete/5928916) to avoid threading issue, custom version to avoid potential conflicts with custom iOS/macOS plugins ref: [storesafe/cordova-sqlite-storage#716](https://github.com/storesafe/cordova-sqlite-storage/issues/716), [storesafe/cordova-sqlite-storage#861](https://github.com/storesafe/cordova-sqlite-storage/issues/861)
   - workaround for redefinition of `SYNTAX_ERR` when using some other plugins ref: [storesafe/cordova-sqlite-storage#868](https://github.com/storesafe/cordova-sqlite-storage/issues/868)
 - Nice overview of alternatives for storing local data in Cordova apps at: <https://www.sitepoint.com/storing-local-data-in-a-cordova-app/>
@@ -336,10 +338,10 @@ In addition, this guide assumes a basic knowledge of some key JavaScript concept
 
 **NOTICE:** This plugin is only supported with the Cordova CLI. This plugin is *not* supported with other Cordova/PhoneGap systems such as PhoneGap CLI, PhoneGap Build, Plugman, Intel XDK, Webstorm, etc.
 
-<!-- [TBD] HIDE browser usage notes for now (at least):
+<!-- [TBD] HIDE browser platform usage notes for now (...):
 ## Browser platform usage notes
 
-As stated above the browser platform will supported with features such as numbered parameters using [kripken / sql.js](https://github.com/kripken/sql.js) (see [storesafe/cordova-sqlite-storage#576](https://github.com/storesafe/cordova-sqlite-storage/pull/576)) in the near future. Alternative solutions for now, with features such as numbered paramters (`?1`, `?2`, etc.) missing:
+As stated above the browser platform supported is in progress with features such as numbered parameters using [kripken / sql.js](https://github.com/kripken/sql.js) (see [storesafe/cordova-sqlite-storage#576](https://github.com/storesafe/cordova-sqlite-storage/pull/576)). Here are some alternative solutions for now, with features such as numbered paramters (`?1`, `?2`, etc.) not supported:
 
 1. Use [brodybits / sql-promise-helper](https://github.com/brodybits/sql-promise-helper) as described in [brodybits/sql-promise-helper#4](https://github.com/brodybits/sql-promise-helper/issues/4)
 2. Mocking on Ionic Native is possible as described in <https://www.techiediaries.com/mocking-native-sqlite-plugin/> and <https://medium.com/@tintin301/ionic-sqlite-storage-setting-up-for-browser-development-and-testing-67c0f17fc7af>
