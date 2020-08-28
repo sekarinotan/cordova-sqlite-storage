@@ -245,9 +245,9 @@ See the [Sample section](#sample) for a sample with a more detailed explanation 
   - Windows platform version uses `UTF-16le` internal database encoding while the other platform versions use `UTF-8` internal encoding. (`UTF-8` internal encoding is preferred ref: [xpbrew/cordova-sqlite-storage#652](https://github.com/xpbrew/cordova-sqlite-storage/issues/652))
   - Known issue with database names that contain certain US-ASCII punctuation and control characters (see below)
 - The macOS platform version ("osx" platform) is not tested in a release build and should be considered pre-alpha.
-- Android versions supported: 3.0 - 9.0 (API level 11 - 28), depending on Cordova version ref: <https://cordova.apache.org/docs/en/latest/guide/platforms/android/>
-- iOS versions supported: 8.x / 9.x / 10.x / 11.x / 12.x (see [deviations section](#deviations) below for differences in case of WKWebView)
-- FTS3, FTS4, and R-Tree are fully tested and supported for all target platforms in this version branch.
+- Android platform versions supported: minimum: 4.0 (deprecated), recommended minimum: 5.1, see also: ref: <https://cordova.apache.org/docs/en/latest/guide/platforms/android/>
+- iOS platform versions supported: minimum 9.0 (see <https://cordova.apache.org/docs/en/latest/guide/platforms/ios/index.html>); see also [deviations section](#deviations) below for differences between WKWebView (cordova-ios 6.0(+)) and UIWebView (cordova-ios pre-6.0)
+- Use FTS3, FTS4, and R-Tree is tested and supported for all target platforms (Android/iOS/macOS/Windows) in this plugin version branch.
 - Default `PRAGMA journal_mode` setting (*tested*):
   - Android use of the `androidDatabaseProvider: 'system'` setting: `persist` (pre-8.0) / `truncate` (Android 8.0, 8.1) / `wal` (Android Pie)
   - otherwise: `delete`
@@ -258,11 +258,10 @@ See the [Sample section](#sample) for a sample with a more detailed explanation 
 
 ## Announcements
 
-- Using recent version of SQLite3 (`3.30.1`) with window functions and recent security updates:
+- Using recent version of SQLite3 (see above) with some new features and important security updates including:
   - [xpbrew/cordova-sqlite-storage#895](https://github.com/xpbrew/cordova-sqlite-storage/issues/895)
   - [xpbrew/cordova-sqlite-storage#867](https://github.com/xpbrew/cordova-sqlite-storage/issues/867)
   - [xpbrew/cordova-sqlite-storage#837](https://github.com/xpbrew/cordova-sqlite-storage/issues/837)
-and window functions
 - Using `SQLITE_DEFAULT_SYNCHRONOUS=3` (EXTRA DURABLE) build setting to be extra robust against possible database corruption ref: [xpbrew/cordova-sqlite-storage#736](https://github.com/xpbrew/cordova-sqlite-storage/issues/736)
 - `SQLITE_DBCONFIG_DEFENSIVE` flag is used for extra SQL safety, as described above
 - Recent build fixes:
@@ -556,7 +555,7 @@ As "strongly recommended" by [Web SQL Database API 8.5 SQL injection](https://ww
 - In case of an issue that causes an API function to throw an exception (Android/iOS WebKit) Web SQL includes includes a code member with value of 0 (SQLError.UNKNOWN_ERR) in the exception while the plugin includes no such code member.
 - This plugin supports some non-standard features as documented below.
 - Results of SELECT with BLOB data such as `SELECT LOWER(X'40414243') AS myresult`, `SELECT X'40414243' AS myresult`, or reading data stored by `INSERT INTO MyTable VALUES (X'40414243')` are not consistent on Android with use of `androidDatabaseProvider: 'system'` setting or Windows. (These work with Android/iOS WebKit Web SQL and have been supported by SQLite for a number of years.)
-- Whole number parameter argument values such as `42`, `-101`, or `1234567890123` are handled as INTEGER values by this plugin on Android, iOS (default UIWebView), and Windows while they are handled as REAL values by (WebKit) Web SQL and by this plugin on iOS with WKWebView (using cordova-plugin-wkwebview-engine) or macOS ("osx"). This is evident in certain test operations such as `SELECT ? as myresult` or `SELECT TYPEOF(?) as myresult` and storage in a field with TEXT affinity.
+- Whole number parameter argument values such as `42`, `-101`, or `1234567890123` are handled as INTEGER values by this plugin on Android, iOS (cordova-ios pre-6.0), and Windows while they are handled as REAL values by (WebKit) Web SQL and by this plugin on iOS with WKWebView (cordova-ios 6.0(+)) or macOS ("osx"). This is evident in certain test operations such as `SELECT ? as myresult` or `SELECT TYPEOF(?) as myresult` and storage in a field with TEXT affinity.
 - INTEGER, REAL, +/- `Infinity`, `NaN`, `null`, `undefined` parameter argument values are handled as TEXT string values on Android with use of the `androidDatabaseProvider: 'system'` setting. (This is evident in certain test operations such as `SELECT ? as myresult` or `SELECT TYPEOF(?) as myresult` and storage in a field with TEXT affinity.)
 - In case of invalid transaction callback arguments such as string values the plugin attempts to execute the transaction while (WebKit) Web SQL would throw an exception.
 - The plugin handles invalid SQL arguments array values such as `false`, `true`, or a string as if there were no arguments while (WebKit) Web SQL would throw an exception. NOTE: In case of a function in place of the SQL arguments array WebKit Web SQL would report a transaction error while the plugin would simply ignore the function.
