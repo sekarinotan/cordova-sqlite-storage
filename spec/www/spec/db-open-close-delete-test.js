@@ -110,7 +110,7 @@ var mytests = function() {
                 expect(rs.rows.length).toBe(1);
                 expect(rs.rows.item(0).name).toBe('main');
                 expect(rs.rows.item(0).file).toBeDefined();
-                expect(rs.rows.item(0).file.indexOf(dbName)).not.toBe(-1);
+                expect(rs.rows.item(0).file.indexOf(dbName) !== -1).toBe(true);
 
                 // Close & finish:
                 db.close(done, done);
@@ -148,7 +148,7 @@ var mytests = function() {
                 expect(rs.rows.length).toBe(1);
                 expect(rs.rows.item(0).name).toBe('main');
                 expect(rs.rows.item(0).file).toBeDefined();
-                expect(rs.rows.item(0).file.indexOf(dbName)).not.toBe(-1);
+                expect(rs.rows.item(0).file.indexOf(dbName) !== -1).toBe(true);
 
                 // Close & finish:
                 db.close(done, done);
@@ -212,7 +212,7 @@ var mytests = function() {
                 expect(rs.rows.length).toBe(1);
                 expect(rs.rows.item(0).name).toBe('main');
                 expect(rs.rows.item(0).file).toBeDefined();
-                expect(rs.rows.item(0).file.indexOf(dbName)).not.toBe(-1);
+                expect(rs.rows.item(0).file.indexOf(dbName) !== -1).toBe(true);
 
                 // Close & finish:
                 db.close(done, done);
@@ -256,7 +256,7 @@ var mytests = function() {
                 expect(rs.rows.length).toBe(1);
                 expect(rs.rows.item(0).name).toBe('main');
                 expect(rs.rows.item(0).file).toBeDefined();
-                expect(rs.rows.item(0).file.indexOf(dbName)).not.toBe(-1);
+                expect(rs.rows.item(0).file.indexOf(dbName) !== -1).toBe(true);
 
                 // Close & finish:
                 db.close(done, done);
@@ -296,7 +296,7 @@ var mytests = function() {
                 expect(rs.rows.length).toBe(1);
                 expect(rs.rows.item(0).name).toBe('main');
                 expect(rs.rows.item(0).file).toBeDefined();
-                expect(rs.rows.item(0).file.indexOf(dbName)).not.toBe(-1);
+                expect(rs.rows.item(0).file.indexOf(dbName) !== -1).toBe(true);
 
                 // Close & finish:
                 db.close(done, done);
@@ -334,7 +334,7 @@ var mytests = function() {
                 expect(rs.rows.length).toBe(1);
                 expect(rs.rows.item(0).name).toBe('main');
                 expect(rs.rows.item(0).file).toBeDefined();
-                expect(rs.rows.item(0).file.indexOf(dbName)).not.toBe(-1);
+                expect(rs.rows.item(0).file.indexOf(dbName) !== -1).toBe(true);
 
                 // Close & finish:
                 db.close(done, done);
@@ -372,7 +372,7 @@ var mytests = function() {
                 expect(rs.rows.length).toBe(1);
                 expect(rs.rows.item(0).name).toBe('main');
                 expect(rs.rows.item(0).file).toBeDefined();
-                expect(rs.rows.item(0).file.indexOf(dbName)).not.toBe(-1);
+                expect(rs.rows.item(0).file.indexOf(dbName) !== -1).toBe(true);
 
                 // Close & finish:
                 db.close(done, done);
@@ -437,7 +437,7 @@ var mytests = function() {
                   expect(rs.rows.length).toBe(1);
                   expect(rs.rows.item(0).name).toBe('main');
                   expect(rs.rows.item(0).file).toBeDefined();
-                  expect(rs.rows.item(0).file.indexOf(dbName)).not.toBe(-1);
+                  expect(rs.rows.item(0).file.indexOf(dbName) !== -1).toBe(true);
 
                   // Close & finish:
                   db.close(done, done);
@@ -497,7 +497,7 @@ var mytests = function() {
                   expect(rs.rows.length).toBe(1);
                   expect(rs.rows.item(0).name).toBe('main');
                   expect(rs.rows.item(0).file).toBeDefined();
-                  expect(rs.rows.item(0).file.indexOf(dbName)).not.toBe(-1);
+                  expect(rs.rows.item(0).file.indexOf(dbName) !== -1).toBe(true);
 
                   // Close & finish:
                   db.close(done, done);
@@ -532,6 +532,9 @@ var mytests = function() {
       });
     }
 
+    describe('Web SQL vs plugin openDatabase test(s)', function() {
+
+      if (true) {
 
         it('Open plugin database with Web SQL parameters (REJECTED with exception)', function(done) {
           try {
@@ -576,7 +579,10 @@ var mytests = function() {
           }
         }, MYTIMEOUT);
 
-      if (window.hasWebKitWebSQL)
+      }
+
+      if (window.hasWebKitWebSQL) {
+
         it('Web SQL check that db name is really a string', function(done) {
           var p1 = { name: 'my.db.name', location: 'default' };
           try {
@@ -597,9 +603,13 @@ var mytests = function() {
           }
         }, MYTIMEOUT);
 
-    for (var i=0; i<pluginScenarioCount; ++i) {
+      }
 
-      describe(pluginScenarioList[i] + ': open database location parameter test(s)', function() {
+    });
+
+    describe('Plugin: open database location parameter test(s)', function() {
+
+      if (true) {
 
         var suiteName = 'Plugin: ';
 
@@ -892,16 +902,73 @@ var mytests = function() {
           }
         }, MYTIMEOUT);
 
-      });
+        it(suiteName + 'open with androidDatabaseProvider: "bogus" - REJECTED with exception', function(done) {
+          try {
+            window.sqlitePlugin.openDatabase({
+              name: 'open-with-androidDatabaseProvider-bogus.db',
+              androidDatabaseProvider: 'bogus',
+              location: 'default'
+            }, function(db) {
+              // NOT EXPECTED:
+              expect(false).toBe(true);
 
-    }
+              // Close (plugin) & finish:
+              db.close(done, done);
+            }, function(error) {
+              // OK but NOT EXPECTED:
+              expect('Behavior changed, please update this test').toBe('--');
+
+              done();
+            });
+          } catch (e) {
+            // EXPECTED RESULT: stopped by the implementation
+            expect(e).toBeDefined();
+
+            done();
+          }
+        }, MYTIMEOUT);
+
+        it(suiteName + 'open with both androidDatabaseProvider and androidDatabaseImplementation - REJECTED with exception', function(done) {
+          try {
+            window.sqlitePlugin.openDatabase({
+              name: 'open-with-androidDatabaseProvider-and-androidDatabaseImplementation.db',
+              androidDatabaseProvider: 'system',
+              androidDatabaseImplementation: 2,
+              location: 'default'
+            }, function(db) {
+              // NOT EXPECTED:
+              expect(false).toBe(true);
+
+              // Close (plugin) & finish:
+              db.close(done, done);
+            }, function(error) {
+              // OK but NOT EXPECTED:
+              expect('Behavior changed, please update this test').toBe('--');
+
+              done();
+            });
+          } catch (e) {
+            // EXPECTED RESULT: stopped by the implementation
+            expect(e).toBeDefined();
+
+            done();
+          }
+        }, MYTIMEOUT);
+
+      }
+
+    });
 
   });
 
 
   describe('Plugin - basic sqlitePlugin.deleteDatabase parameter check test(s)', function() {
 
+    if (true) {
+
       var suiteName = 'plugin: ';
+
+      if (true) {
 
         it(suiteName + 'check that sqlitePlugin.deleteDatabase db name is really a string', function(done) {
           var p1 = { name: 'my.db.name', location: 1 };
@@ -1126,9 +1193,13 @@ var mytests = function() {
           }
         }, MYTIMEOUT);
 
+      }
+
+    }
+
   });
 
-  describe('Plugin: db open-close-delete test(s)', function() {
+  describe('Plugin: db open-close-delete operation behavior test(s)', function() {
 
     for (var i=0; i<pluginScenarioCount; ++i) {
 
@@ -1376,7 +1447,7 @@ var mytests = function() {
 
         test_it(suiteName + ' database.close (immediately after open) calls its success callback', function () {
           // TBD POSSIBLY BROKEN on iOS/macOS due to current background processing implementation:
-          if (!isAndroid && !isWindows) pending('CURRENTLY BROKEN on iOS/macOS (background processing implementation)');
+          if (isAppleMobileOS || isMac) pending('TBD POSSIBLY BROKEN on iOS/macOS (background processing implementation)');
 
           // asynch test coming up
           stop(1);
@@ -1579,7 +1650,7 @@ var mytests = function() {
           window.sqlitePlugin.deleteDatabase(first, second, third);
         }
 
-        // Needed to support some large-scale applications:
+        // (Was needed to test support for an enterprise application)
         test_it(suiteName + ' open same database twice in [same] specified location works', function () {
           // XXX TODO [BROKEN]: same db name, different location should be different db!
           stop(2);
@@ -1617,7 +1688,7 @@ var mytests = function() {
           });
         });
 
-        // Needed to support some large-scale applications:
+        // (Was needed to test support for an enterprise application)
         test_it(suiteName + ' close then re-open (2x) allows subsequent queries to run', function () {
           // asynch test coming up
           stop(1);
@@ -1668,7 +1739,7 @@ var mytests = function() {
           });
         });
 
-        // Needed to support some large-scale applications:
+        // (Was needed to test support for an enterprise application)
         test_it(suiteName + " delete then re-open (location: 'default') allows subsequent queries to run", function () {
           var dbName = "test-database-delete-and-reopen.db";
           var dbargs = {name: dbName, iosDatabaseLocation: 'default'};
@@ -1710,9 +1781,9 @@ var mytests = function() {
         });
 
         // XXX SEE BELOW: repeat scenario but wait for open callback before close/delete/reopen
-        // Needed to support some large-scale applications:
+        // (Was needed to test support for an enterprise application)
         test_it(suiteName + ' immediate close, then delete then re-open allows subsequent queries to run', function () {
-          if (!isAndroid && !isWindows) pending('CURRENTLY BROKEN on iOS/macOS (background processing implementation)');
+          if (isAppleMobileOS || isMac) pending('CURRENTLY BROKEN on iOS/macOS (background processing implementation)');
 
           var dbName = "Immediate-close-delete-Reopen.db";
           var dbargs = {name: dbName, location: 'default'};
@@ -1859,7 +1930,7 @@ var mytests = function() {
 
         test_it(suiteName + ' repeatedly open and close database faster (5x)', function () {
           // TBD CURRENTLY BROKEN on iOS/macOS due to current background processing implementation:
-          if (!isAndroid && !isWindows) pending('CURRENTLY BROKEN on iOS/macOS (background processing implementation)');
+          if (isAppleMobileOS || isMac) pending('CURRENTLY BROKEN on iOS/macOS (background processing implementation)');
           // TBD ???:
           if (isAndroid && isImpl2) pending('FAILS on builtin android.database implementation (androidDatabaseImplementation: 2)');
 
@@ -1917,7 +1988,7 @@ var mytests = function() {
           });
         });
 
-        // Needed to support some large-scale applications:
+        // (Was needed to test support for an enterprise application)
         test_it(suiteName + ' repeatedly open and delete database (4x)', function () {
           var dbName = 'test-repeatedly-open-and-delete-4x.db';
           var dbargs = {name: dbName, iosDatabaseLocation: 'Documents'};
@@ -1980,7 +2051,7 @@ var mytests = function() {
           });
         });
 
-        // Needed to support some large-scale applications:
+        // (Was needed to test support for an enterprise application)
         test_it(suiteName + ' repeatedly open and delete database faster (5x)', function () {
           // TBD POSSIBLY BROKEN on iOS/macOS ...
           // if (!isAndroid && !isWindows) pending(...);

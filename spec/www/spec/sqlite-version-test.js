@@ -62,8 +62,8 @@ var mytests = function() {
 
       describe(suiteName + 'basic sqlite version test(s)', function() {
 
-        it(suiteName + 'Check sqlite version (check pattern ONLY for WebKit Web SQL & androidDatabaseImplementation: 2)', function(done) {
-          var db = openDatabase("check-sqlite-version.db", "1.0", "Demo", DEFAULT_SIZE);
+        it(suiteName + 'Check sqlite version correctly matches pattern', function(done) {
+          var db = openDatabase("check-sqlite-version-matches-pattern.db", "1.0", "Demo", DEFAULT_SIZE);
 
           expect(db).toBeDefined();
 
@@ -74,11 +74,35 @@ var mytests = function() {
               expect(rs).toBeDefined();
               expect(rs.rows).toBeDefined();
               expect(rs.rows.length).toBe(1);
-              // Check pattern (both Web SQL & plugin)
               expect(rs.rows.item(0).myResult).toMatch(/3\.[0-9]+\.[0-9]+/);
-              // Check specific [plugin only]:
-              if (!isWebSql && !(!isWindows && isAndroid && isImpl2))
-                expect(rs.rows.item(0).myResult).toBe('3.22.0');
+
+              // Close (plugin only) & finish:
+              (isWebSql) ? done() : db.close(done, done);
+            });
+          }, function(error) {
+            // NOT EXPECTED:
+            expect(false).toBe(true);
+            expect(error.message).toBe('--');
+            done();
+          });
+        }, MYTIMEOUT);
+
+        it(suiteName + 'Check actual sqlite version', function(done) {
+          if (isWebSql) pending('NOT DETERMINISTIC for (WebKit) Web SQL');
+          if (!isWebSql && isAndroid && isImpl2) pending('NOT DETERMINISTIC for plugin on Android with androidDatabaseImplementation: 2');
+
+          var db = openDatabase("check-actual-sqlite-version.db", "1.0", "Demo", DEFAULT_SIZE);
+
+          expect(db).toBeDefined();
+
+          db.transaction(function(tx) {
+            expect(tx).toBeDefined();
+
+            tx.executeSql('SELECT SQLITE_VERSION() AS myResult', [], function(tx_ignored, rs) {
+              expect(rs).toBeDefined();
+              expect(rs.rows).toBeDefined();
+              expect(rs.rows.length).toBe(1);
+              expect(rs.rows.item(0).myResult).toBe('3.32.3');
 
               // Close (plugin only) & finish:
               (isWebSql) ? done() : db.close(done, done);
@@ -135,10 +159,7 @@ var mytests = function() {
             expect(rs).toBeDefined();
             expect(rs.rows).toBeDefined();
             expect(rs.rows.length).toBe(1);
-            if (!isWebSql && (isBrowser || (!isWindows && isAndroid && isImpl2)))
-              expect(rs.rows.item(0).page_size).toBe(4096); // CORRECT [androidDatabaseImplementation: 2]
-            else
-              expect(rs.rows.item(0).page_size).toBe(1024); // XXX TBD OLD VALUE USED IN THIS PLUGIN VERSION ref: litehelpers/Cordova-sqlite-storage#781
+            expect(rs.rows.item(0).page_size).toBe(4096);
 
             // Close (plugin only) & finish:
             (isWebSql) ? done() : db.close(done, done);
@@ -164,11 +185,11 @@ var mytests = function() {
             var resultRow = rs.rows.item(0);
             expect(resultRow).toBeDefined();
             expect(resultRow.cache_size).toBeDefined();
-            if (!isWebSql && (isBrowser || (!isWindows && isAndroid && isImpl2 &&
-                (/Android 8/.test(navigator.userAgent)))))
-              expect(resultRow.cache_size).toBe(-2000); // NEW VALUE for androidDatabaseImplementation: 2, Android 8.x
+            if (!isWebSql && isAndroid && isImpl2
+                && (/Android [3-7]/.test(navigator.userAgent)))
+              expect(resultRow.cache_size).toBe(2000); // TBD OLD VALUE on Android (...)
             else
-              expect(resultRow.cache_size).toBe(2000); // XXX TBD OLD VALUE USED IN THIS PLUGIN VERSION & androidDatabaseImplementation: 2 for Android 4.x-7.x
+              expect(resultRow.cache_size).toBe(-2000); // NEW VALUE, otherwise
 
             // Close (plugin only) & finish:
             (isWebSql) ? done() : db.close(done, done);
@@ -200,6 +221,7 @@ var mytests = function() {
             // DIFFERENT for builtin android.database implementation:
             if (!isWindows && isAndroid && isImpl2)
               expect(rs.rows.item(0).journal_mode).toBe(
+                (/Android 9/.test(navigator.userAgent)) ? 'wal' :
                 (/Android 8.1.99/.test(navigator.userAgent)) ? 'wal' :
                 (/Android 8/.test(navigator.userAgent)) ? 'truncate' :
                 'persist');
