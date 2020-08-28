@@ -22,11 +22,10 @@
 
     <platform name="browser">
         <!-- ... -->
-        <js-module src="src/browser/SQLiteProxy.js" name="SQLiteProxy">
+        <js-module src="node_modules/cordova-sqlite-storage-dependencies/sql-asm-memory-growth.js" name="sql">
           <runs />
         </js-module>
-
-        <js-module src="node_modules/cordova-sqlite-storage-dependencies/sql-memory-growth.js" name="sql">
+        <js-module src="src/browser/SQLiteProxy.js" name="SQLiteProxy">
           <runs />
         </js-module>
     </platform>
